@@ -1,5 +1,4 @@
 use std::io::stdin;
-
 use anyhow::bail;
 
 #[derive(Clone, Copy, Debug)]
@@ -11,19 +10,26 @@ enum Marker {
 
 #[derive(Debug)]
 struct Position(
-    (Marker, Marker, Marker),
-    (Marker, Marker, Marker),
-    (Marker, Marker, Marker),
+    Marker,
+    Marker,
+    Marker,
+    Marker,
+    Marker,
+    Marker,
+    Marker,
+    Marker,
+    Marker,
 );
 
 impl Position {
     fn new() -> Self {
-        Self(
-            (Marker::Empty, Marker::Empty, Marker::Empty),
-            (Marker::Empty, Marker::Empty, Marker::Empty),
-            (Marker::Empty, Marker::Empty, Marker::Empty),
-        )
+        Self::_repeat(Marker::Empty)
     }
+
+    fn _repeat(n: Marker) -> Self {
+        Self(n, n, n, n, n, n, n, n, n)
+    }
+
     fn from(notation: &str) -> anyhow::Result<Self> {
         let notation = notation.split('|').collect::<Vec<&str>>();
         let mut cnotation = vec![];
@@ -41,9 +47,15 @@ impl Position {
             })
         }
         Ok(Self(
-            (cnotation[0], cnotation[1], cnotation[2]),
-            (cnotation[3], cnotation[4], cnotation[5]),
-            (cnotation[6], cnotation[7], cnotation[8]),
+            cnotation[0],
+            cnotation[1],
+            cnotation[2],
+            cnotation[3],
+            cnotation[4],
+            cnotation[5],
+            cnotation[6],
+            cnotation[7],
+            cnotation[8],
         ))
     }
 }
