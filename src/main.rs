@@ -2,6 +2,7 @@
 
 use anyhow::bail;
 use std::{array, fmt::Display, io::stdin};
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum Marker {
     O,
@@ -74,7 +75,7 @@ impl Position {
     fn draw(&self) -> bool {
         let empty = self.0.iter().filter(|&e| *e == Marker::Empty);
 
-        if self.winning().is_some() && empty.count() == 0 {
+        if self.winning().is_none() && empty.count() == 0 {
             return true;
         }
         false
