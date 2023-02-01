@@ -3,15 +3,21 @@
 use anyhow::bail;
 use std::{array, fmt::Display, io::stdin};
 
+use crate::engine::find_best_move;
+mod engine;
+
+pub type Move = usize;
+pub type Eval = i64;
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-enum Marker {
+pub enum Marker {
     O,
     X,
     Empty,
 }
 
-#[derive(Debug)]
-struct Position([Marker; 9]);
+#[derive(Debug, Clone, Copy)]
+pub struct Position([Marker; 9]);
 
 impl Position {
     const fn new() -> Self {
@@ -80,6 +86,11 @@ impl Position {
         }
         false
     }
+
+    fn make_move(&mut self, pos: Move) -> Self {
+        self.0[pos] = self.player();
+        *self
+    }
 }
 
 impl Display for Marker {
@@ -113,40 +124,52 @@ impl Display for Position {
 fn main() {
     println!("...");
 
-    let mut ready = false;
     let mut position = Position::new();
 
     loop {
         let mut command = String::new();
         stdin().read_line(&mut command).unwrap();
 
-        if command.starts_with("isready") && !ready {
+        if command.starts_with("isready") {
             println!("readyok");
-            ready = true;
             continue;
         }
 
-        if ready {
-            if command.starts_with("position") {
-                let mut split = command.split_ascii_whitespace();
-                if split.clone().count() == 1 {
-                    continue;
-                }
-                split.next();
-                if let Ok(res) = Position::from(split.next().unwrap()) {
-                    position = res;
-                    println!("{:?}", position);
-                }
-            } else if command.starts_with("go") {
+        if command.starts_with("position") {
+            let mut split = command.split_ascii_whitespace();
+            if split.clone().count() == 1 {
+                continue;
+            }
+            split.next();
+            if let Ok(res) = Position::from(split.next().unwrap()) {
+                position = res;
                 println!("{}", position);
+            }
+        } else if command.starts_with("go") {
+            println!("{}", position);
+            if let Some(marker) = position.winning() {
+                println!("winner: {:?}", marker);
+                continue;
+            } else if position.draw() {
+                println!("draw");
+                continue;
+            }
+            println!("plays: {:?}", position.player());
+
+            let (eval, pos) = find_best_move(position);
+            println!("eval:{eval} move:{pos}",);
+            
+        } else if command.starts_with("self") {
+            loop {
                 if let Some(marker) = position.winning() {
                     println!("winner: {:?}", marker);
-                    continue;
+                    break;
                 } else if position.draw() {
                     println!("draw");
-                    continue;
+                    break;
                 }
-                println!("plays: {:?}", position.player());
+                let j = find_best_move(position);
+                position.make_move(j.1);
             }
         }
     }
