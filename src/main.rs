@@ -1,7 +1,8 @@
 #![warn(clippy::pedantic, clippy::nursery)]
+#![allow(clippy::cast_precision_loss)]
 
 use anyhow::bail;
-use std::{array, fmt::Display, io::stdin};
+use std::{array, fmt::Display, io::stdin, time::Instant};
 
 use crate::engine::find_best_move;
 mod engine;
@@ -146,6 +147,8 @@ fn main() {
                 println!("{}", position);
             }
         } else if command.starts_with("go") {
+            // Compute and return the best move
+
             println!("{}", position);
             if let Some(marker) = position.winning() {
                 println!("winner: {:?}", marker);
@@ -158,19 +161,35 @@ fn main() {
 
             let (eval, pos) = find_best_move(position);
             println!("eval:{eval} move:{pos}",);
-            
         } else if command.starts_with("self") {
-            loop {
-                if let Some(marker) = position.winning() {
-                    println!("winner: {:?}", marker);
-                    break;
-                } else if position.draw() {
-                    println!("draw");
-                    break;
+            // Plays the bot against itself. It should *always* result in a draw.
+
+            let mut times = vec![];
+
+            for _ in 0..1 {
+                let time = Instant::now();
+                position = Position::new();
+
+                loop {
+                    if let Some(marker) = position.winning() {
+                        println!("winner: {:?}", marker);
+                        break;
+                    } else if position.draw() {
+                        println!("draw");
+                        times.push(time.elapsed().as_millis());
+                        break;
+                    }
+                    let j = find_best_move(position);
+                    position.make_move(j.1);
                 }
-                let j = find_best_move(position);
-                position.make_move(j.1);
             }
+
+            println!("game times: {:?}", times);
+
+            println!(
+                "average time: {:?}",
+                times.iter().sum::<u128>() as f64 / times.len() as f64
+            );
         }
     }
 }

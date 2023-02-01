@@ -1,1 +1,6 @@
 A simple project to learn how to implement a UCI-like interface and the minimax algorithm before starting on a chess engine.
+
+| Algorithm             | Branches explored | Time taken for draw from self play/ms |
+|-----------------------|-------------------|---------------------------------------|
+| Minimax               | 618184            | 1124.0                                |
+| Minimax w/ AB pruning | 28355             | 55.0                                  |
