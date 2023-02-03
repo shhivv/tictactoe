@@ -63,11 +63,10 @@ fn minimax(
 
 fn eval(position: Position, depth: u8, maximize: bool) -> Eval {
     if position.winning().is_some() {
-        let score = 100 - i64::from(depth);
         if maximize {
-            return -score;
+            return -(i64::from(depth));
         }
-        return score;
+        return i64::from(depth);
     }
     0
 }

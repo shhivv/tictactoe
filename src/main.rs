@@ -166,7 +166,7 @@ fn main() {
 
             let mut times = vec![];
 
-            for _ in 0..1 {
+            for _ in 0..10 {
                 let time = Instant::now();
                 position = Position::new();
 
